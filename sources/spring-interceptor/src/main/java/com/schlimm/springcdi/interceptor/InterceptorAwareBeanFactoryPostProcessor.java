@@ -4,11 +4,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
+import com.schlimm.springcdi.interceptor.strategies.InterceptorResolutionStrategy;
+
 public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
+	private InterceptorResolutionStrategy interceptorResolutionStrategy;
+	
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		// TODO Auto-generated method stub
 		
 	}
 
