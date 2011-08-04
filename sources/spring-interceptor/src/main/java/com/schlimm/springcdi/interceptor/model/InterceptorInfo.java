@@ -1,8 +1,8 @@
 package com.schlimm.springcdi.interceptor.model;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +28,7 @@ public abstract class InterceptorInfo {
 	
 	protected Set<MethodMetadata> interceptorMethods;
 
-	private List<String> interceptedBeans = new ArrayList<String>();
+	private Set<String> interceptedBeans = new HashSet<String>();
 	
 	private List<String> interceptorBindings = new ArrayList<String>();
 	
@@ -40,7 +40,7 @@ public abstract class InterceptorInfo {
 	/**
 	 * All methods where this interceptor is defined on the method level
 	 */
-	protected List<Method> interceptedMethods = new ArrayList<Method>();
+	protected List<MethodMetadata> interceptedMethods = new ArrayList<MethodMetadata>();
 	
 	public InterceptorInfo(BeanDefinitionHolder beanDefinitionHolder, List<InterceptedBusinessMethod> targetBusinessMethods) {
 		Assert.isInstanceOf(AnnotatedBeanDefinition.class, beanDefinitionHolder.getBeanDefinition());
@@ -91,11 +91,11 @@ public abstract class InterceptorInfo {
 		return interceptorBindings;
 	}
 
-	public void setInterceptedBeans(List<String> interceptedBeans) {
+	public void setInterceptedBeans(Set<String> interceptedBeans) {
 		this.interceptedBeans = interceptedBeans;
 	}
 
-	public List<String> getInterceptedBeans() {
+	public Set<String> getInterceptedBeans() {
 		return interceptedBeans;
 	}
 
@@ -124,11 +124,11 @@ public abstract class InterceptorInfo {
 		classLevelInterceptions.add(beanName);
 	}
 
-	public void addInterceptedMethod(Method method) {
+	public void addInterceptedMethod(MethodMetadata method) {
 		interceptedMethods.add(method);
 	}
 
-	public List<Method> getInterceptedMethods() {
+	public List<MethodMetadata> getInterceptedMethods() {
 		return interceptedMethods;
 	}
 	

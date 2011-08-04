@@ -1,6 +1,7 @@
 package com.schlimm.springcdi.interceptor.model;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,6 +27,8 @@ public class InterceptorMetaDataBean {
 	}
 
 	public List<InterceptorInfo> getMatchingInterceptors(String beanName, Method method) {
+		List<InterceptorInfo> interceptors = new ArrayList<InterceptorInfo>();
+		interceptors.addAll(null);
 		// get all class level interceptors for bean name
 		// get all method level interceptors for method
 		return null;

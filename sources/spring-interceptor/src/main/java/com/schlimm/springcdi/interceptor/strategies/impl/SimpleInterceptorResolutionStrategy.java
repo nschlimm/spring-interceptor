@@ -10,7 +10,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.type.MethodMetadata;
-import org.springframework.core.type.StandardMethodMetadata;
 
 import com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcessorException;
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
@@ -68,9 +67,10 @@ public class SimpleInterceptorResolutionStrategy implements InterceptorResolutio
 						interceptorInfo.addClassLevelInterception(bdName);
 					}
 					if (abd.getMetadata().hasAnnotatedMethods(binding)){
+						interceptorInfo.addInterceptedBean(bdName);
 						Set<MethodMetadata> methods = abd.getMetadata().getAnnotatedMethods(binding);
 						for (MethodMetadata methodMetadata : methods) {
-							interceptorInfo.addInterceptedMethod(((StandardMethodMetadata)methodMetadata).getIntrospectedMethod());
+							interceptorInfo.addInterceptedMethod(methodMetadata);
 						}
 					}
 				}
