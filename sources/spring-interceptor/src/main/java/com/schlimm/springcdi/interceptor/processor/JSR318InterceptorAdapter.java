@@ -1,7 +1,6 @@
 package com.schlimm.springcdi.interceptor.processor;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 import javax.interceptor.InvocationContext;
 
@@ -24,7 +23,7 @@ public class JSR318InterceptorAdapter implements MethodInterceptor {
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		Object retVal = null;
-		InvocationContext context = new StandardInvocationContext(invocation.getThis(), invocation.getMethod(), invocation.getArguments(), new HashMap<String, Object>());
+		InvocationContext context = new MethodInvocationWrapper(invocation);
 		retVal = ReflectionUtils.invokeMethod(jsr318InterceptorMethod, interceptor, context);
 		return retVal;
 	}

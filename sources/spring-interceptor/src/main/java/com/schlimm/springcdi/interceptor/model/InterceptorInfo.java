@@ -14,7 +14,6 @@ import javax.interceptor.InterceptorBinding;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.core.type.MethodMetadata;
 import org.springframework.util.Assert;
 
 public abstract class InterceptorInfo {
@@ -27,7 +26,7 @@ public abstract class InterceptorInfo {
 
 	protected AnnotationMetadata annotationMetadata;
 
-	protected Set<MethodMetadata> interceptorMethods;
+	private Set<Method> interceptorMethods = new HashSet<Method>();
 
 	private Set<String> interceptedBeans = new HashSet<String>();
 
@@ -147,6 +146,14 @@ public abstract class InterceptorInfo {
 			}
 		}
 		return false;
+	}
+
+	public void setInterceptorMethods(Set<Method> interceptorMethods) {
+		this.interceptorMethods = interceptorMethods;
+	}
+
+	public Set<Method> getInterceptorMethods() {
+		return interceptorMethods;
 	}
 
 }
