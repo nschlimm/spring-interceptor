@@ -21,7 +21,7 @@ import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorResolu
 @ContextConfiguration("/test-context-interceptor-simple_methodlevel.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-public class InterceptorAwareDelegatingMethodInterceptorTest {
+public class InterceptedBeanInterceptorTest {
 
 	@Autowired
 	private BeanFactory beanFactory;
