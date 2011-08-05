@@ -33,7 +33,7 @@ public class SimpleInterceptorResolutionStrategyTest_methodlevel {
 	
 	@Test
 	public void testCountInterceptedBusinessMethods() {
-		Assert.assertTrue(((MethodInterceptorInfo)new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory).get(0)).getInterceptedMethods().size()==1);
+		Assert.assertTrue(((MethodInterceptorInfo)new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory).get(0)).getInterceptedMethods().size()==2);
 	}
 	
 	@Test

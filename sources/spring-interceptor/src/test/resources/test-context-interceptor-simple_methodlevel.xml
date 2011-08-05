@@ -8,7 +8,11 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
 	default-autowire="byName">
 
-	<context:component-scan base-package="com.schlimm.springcdi.interceptor.simple*" scoped-proxy="targetClass">
+	<context:component-scan base-package="com.schlimm.springcdi.interceptor.simple" scoped-proxy="targetClass">
+		<context:include-filter type="annotation" expression="javax.interceptor.Interceptor" />
+	</context:component-scan>
+
+	<context:component-scan base-package="com.schlimm.springcdi.interceptor.simple_methodlevel" scoped-proxy="targetClass">
 		<context:include-filter type="annotation" expression="javax.interceptor.Interceptor" />
 	</context:component-scan>
 

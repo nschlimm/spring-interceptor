@@ -1,5 +1,6 @@
 package com.schlimm.springcdi.interceptor.strategies.impl;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -9,9 +10,11 @@ import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.MethodMetadata;
 
 import com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcessorException;
+import com.schlimm.springcdi.interceptor.InterceptorModuleUtils;
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.model.MethodInterceptorInfo;
 import com.schlimm.springcdi.interceptor.strategies.InterceptorResolutionStrategy;
@@ -53,6 +56,7 @@ public class SimpleInterceptorResolutionStrategy implements InterceptorResolutio
 		return interceptors;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void resolveInterceptorTargets(BeanFactory beanFactory, InterceptorInfo interceptorInfo) {
 		List<String> interceptorBindings = interceptorInfo.getInterceptorBindings();
 		ConfigurableListableBeanFactory configurableListableBeanFactory = (ConfigurableListableBeanFactory) beanFactory;
@@ -60,7 +64,7 @@ public class SimpleInterceptorResolutionStrategy implements InterceptorResolutio
 		for (String bdName : bnNames) {
 			BeanDefinition bd = configurableListableBeanFactory.getBeanDefinition(bdName);
 			if (bd instanceof AnnotatedBeanDefinition && !InterceptorInfo.isInterceptor((AnnotatedBeanDefinition) bd)) {
-				AnnotatedBeanDefinition abd = (AnnotatedBeanDefinition) bd;
+ 				AnnotatedBeanDefinition abd = (AnnotatedBeanDefinition) bd;
 				for (String binding : interceptorBindings) {
 					if (abd.getMetadata().hasAnnotation(binding)){
 						interceptorInfo.addInterceptedBean(bdName);
@@ -70,12 +74,19 @@ public class SimpleInterceptorResolutionStrategy implements InterceptorResolutio
 						interceptorInfo.addInterceptedBean(bdName);
 						Set<MethodMetadata> methods = abd.getMetadata().getAnnotatedMethods(binding);
 						for (MethodMetadata methodMetadata : methods) {
-							interceptorInfo.addInterceptedMethod(methodMetadata);
+							Set<Method> jlrMethods = InterceptorModuleUtils.getMethodsForName(InterceptorModuleUtils.getClass_forName(methodMetadata.getDeclaringClassName()),methodMetadata.getMethodName());
+							for (Method method : jlrMethods) {
+								if (AnnotationUtils.findAnnotation(method, InterceptorModuleUtils.getClass_forName(binding))!=null) {
+									interceptorInfo.addInterceptedMethod(method);
+								}
+							}
 						}
 					}
 				}
 			}
 		}
 	}
+	
+	
 
 }

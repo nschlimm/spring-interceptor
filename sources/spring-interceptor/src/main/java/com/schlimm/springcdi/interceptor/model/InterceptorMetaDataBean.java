@@ -3,20 +3,16 @@ package com.schlimm.springcdi.interceptor.model;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class InterceptorMetaDataBean {
 	
-	private Set<InterceptorInfo> interceptors;
+	private List<InterceptorInfo> interceptors;
 
-	public void setInterceptors(Set<InterceptorInfo> interceptors) {
+	public InterceptorMetaDataBean(List<InterceptorInfo> interceptors) {
+		super();
 		this.interceptors = interceptors;
 	}
 
-	public Set<InterceptorInfo> getInterceptors() {
-		return interceptors;
-	}
-	
 	public boolean isInterceptedBean(String beanName) {
 		for (InterceptorInfo interceptor : interceptors) {
 			if (interceptor.isInterceptingBean(beanName)) {
@@ -27,11 +23,21 @@ public class InterceptorMetaDataBean {
 	}
 
 	public List<InterceptorInfo> getMatchingInterceptors(String beanName, Method method) {
-		List<InterceptorInfo> interceptors = new ArrayList<InterceptorInfo>();
-		interceptors.addAll(null);
-		// get all class level interceptors for bean name
-		// get all method level interceptors for method
-		return null;
+		List<InterceptorInfo> matchingInterceptors = new ArrayList<InterceptorInfo>();
+		for (InterceptorInfo interceptorInfo : interceptors) {
+				if (interceptorInfo.matches(beanName, method)) {
+					matchingInterceptors.add(interceptorInfo);
+				}
+		}
+		return matchingInterceptors;
+	}
+
+	public List<InterceptorInfo> getInterceptors() {
+		return interceptors;
+	}
+
+	public void setInterceptors(List<InterceptorInfo> interceptors) {
+		this.interceptors = interceptors;
 	}
 
 }

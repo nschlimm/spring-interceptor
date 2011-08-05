@@ -1,6 +1,6 @@
 package com.schlimm.springcdi.interceptor.processor;
 
-public interface InvocationContextInterceptorProxyInspector {
+public interface InterceptorProxyInspector {
 
 	Object getInterceptorTarget();
 	

@@ -1,6 +1,7 @@
 package com.schlimm.springcdi.interceptor.model;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,35 +18,35 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.util.Assert;
 
 public abstract class InterceptorInfo {
-	
+
 	protected static Class<? extends Annotation> interceptorAnnotationType = Interceptor.class;
-	
+
 	protected static Class<? extends Annotation> interceptorBindingAnnotationType = InterceptorBinding.class;
 
 	protected BeanDefinitionHolder beanDefinitionHolder;
-	
+
 	protected AnnotationMetadata annotationMetadata;
-	
+
 	protected Set<MethodMetadata> interceptorMethods;
 
 	private Set<String> interceptedBeans = new HashSet<String>();
-	
+
 	private List<String> interceptorBindings = new ArrayList<String>();
-	
+
 	/**
 	 * Name of the beans where this interceptor is defined on the class level
 	 */
 	protected List<String> classLevelInterceptions = new ArrayList<String>();
-	
+
 	/**
 	 * All methods where this interceptor is defined on the method level
 	 */
-	protected List<MethodMetadata> interceptedMethods = new ArrayList<MethodMetadata>();
-	
+	protected List<Method> interceptedMethods = new ArrayList<Method>();
+
 	public InterceptorInfo(BeanDefinitionHolder beanDefinitionHolder, List<InterceptedBusinessMethod> targetBusinessMethods) {
 		Assert.isInstanceOf(AnnotatedBeanDefinition.class, beanDefinitionHolder.getBeanDefinition());
 		this.beanDefinitionHolder = beanDefinitionHolder;
-		this.annotationMetadata = ((AnnotatedBeanDefinition)beanDefinitionHolder.getBeanDefinition()).getMetadata();
+		this.annotationMetadata = ((AnnotatedBeanDefinition) beanDefinitionHolder.getBeanDefinition()).getMetadata();
 		resolveInterceptorMethods();
 		resolveInterceptorBindings();
 	}
@@ -63,9 +64,9 @@ public abstract class InterceptorInfo {
 	}
 
 	protected abstract void resolveInterceptorMethods();
-	
+
 	public InterceptorInfo(BeanDefinitionHolder beanDefinitionHolder) {
-		this(beanDefinitionHolder,null);
+		this(beanDefinitionHolder, null);
 	}
 
 	public BeanDefinitionHolder getBeanDefinitionHolder() {
@@ -100,9 +101,10 @@ public abstract class InterceptorInfo {
 	}
 
 	public void addInterceptedBean(String beanName) {
-		interceptedBeans.add(beanName);
+		if (!interceptedBeans.contains(beanName))
+			interceptedBeans.add(beanName);
 	}
-	
+
 	public boolean isInterceptingBean(String beanName) {
 		Assert.notNull(beanName);
 		for (String interceptedBeanName : interceptedBeans) {
@@ -119,17 +121,32 @@ public abstract class InterceptorInfo {
 	public List<String> getClassLevelInterceptions() {
 		return classLevelInterceptions;
 	}
-	
+
 	public void addClassLevelInterception(String beanName) {
 		classLevelInterceptions.add(beanName);
 	}
 
-	public void addInterceptedMethod(MethodMetadata method) {
-		interceptedMethods.add(method);
+	public void addInterceptedMethod(Method method) {
+		if (!interceptedMethods.contains(method))
+			interceptedMethods.add(method);
 	}
 
-	public List<MethodMetadata> getInterceptedMethods() {
+	public List<Method> getInterceptedMethods() {
 		return interceptedMethods;
 	}
-	
+
+	public boolean matches(String beanName, Method givenMethod) {
+		for (Method interceptedMethod : interceptedMethods) {
+			if (givenMethod.equals(interceptedMethod)) {
+				return true;
+			}
+		}
+		for (String interceptedBeanName : classLevelInterceptions) {
+			if (interceptedBeanName.equals(beanName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

@@ -13,4 +13,9 @@ public class Simple_MyServiceInterface_Impl implements Simple_MyServiceInterface
 		return "Hello";
 	}
 
+	@Override
+	public String sayHello(String what) {
+		return what;
+	}
+
 }
