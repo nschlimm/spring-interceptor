@@ -21,5 +21,10 @@ public class Simple_MyServiceInterface_Impl2 implements Simple_MyServiceInterfac
 	public String sayHello(String what) {
 		return what;
 	}
+
+	@Override
+	public String sayGoodBye() {
+		return "Good bye";
+	}
 	
 }

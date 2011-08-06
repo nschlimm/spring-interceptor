@@ -18,4 +18,9 @@ public class Simple_MyServiceInterface_Impl implements Simple_MyServiceInterface
 		return what;
 	}
 
+	@Override
+	public String sayGoodBye() {
+		return "Good bye";
+	}
+
 }

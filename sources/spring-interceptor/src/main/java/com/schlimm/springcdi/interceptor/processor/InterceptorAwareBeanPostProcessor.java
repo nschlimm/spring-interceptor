@@ -1,5 +1,7 @@
 package com.schlimm.springcdi.interceptor.processor;
 
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.target.SimpleBeanTargetSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
  * {@link BeanPostProcessor} that applies the JSR-299 decorator pattern to the Spring beans.
  * 
  * If the processed bean is a decorated bean, then this {@link BeanPostProcessor} returns a CGLIB proxy for that bean. Uses a
- * {@link JSR318InterceptorAdapter} to delegate calls to that given delegate bean to the decorator chain.
+ * {@link JSR318InterceptorMethodAdapter} to delegate calls to that given delegate bean to the decorator chain.
  * 
  * @author Niklas Schlimm
  * 
@@ -23,44 +25,47 @@ public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor, Ini
 	private InterceptorMetaDataBean metaData;
 
 	@Autowired
-	private final ConfigurableListableBeanFactory beanFactory = null;
+	private ConfigurableListableBeanFactory beanFactory = null;
 
-	/**
-	 * Chaining strategy in use, may be custom strategy
-	 */
-//	private DecoratorChainingStrategy chainingStrategy;
+	
+	public InterceptorAwareBeanPostProcessor() {
+		super();
+	}
 
-	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
+	public InterceptorAwareBeanPostProcessor(InterceptorMetaDataBean metaData, ConfigurableListableBeanFactory beanFactory) {
+		super();
+		this.metaData = metaData;
+		this.beanFactory = beanFactory;
 	}
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
 		if (metaData.isInterceptedBean(beanName)) {
-			return buildInterceptingProxy(bean, beanName);
+			return createProxyForBean(beanName, bean);
 		} else {
 			return bean;
 		}
 	}
 
-//	@SuppressWarnings("serial")
-	public Object buildInterceptingProxy(final Object bean, final String beanName) {
-//		final SimpleBeanTargetSource targetSource = new SimpleBeanTargetSource() {{setTargetBeanName(beanName); setTargetClass(bean.getClass()); setBeanFactory(beanFactory);}};
-//		ProxyFactory pf = new ProxyFactory() {{setTargetSource(targetSource); setProxyTargetClass(true);}};
-//		JSR318InterceptorAdapter interceptor = new JSR318InterceptorAdapter(chainingStrategy.getChainedDecorators(beanFactory, metaData.getQualifiedDecoratorChain(beanName), bean));
-//		pf.addAdvice(interceptor); pf.addInterface(InterceptorProxyInspector.class);
-//		Object proxy = pf.getProxy();
-//		return proxy;
-		return null;
+	@SuppressWarnings("serial")
+	private Object createProxyForBean(final String beanName, final Object bean) {
+		final SimpleBeanTargetSource targetSource = new SimpleBeanTargetSource() {{setTargetBeanName(beanName);setTargetClass(bean.getClass());setBeanFactory(beanFactory);}};
+		ProxyFactory pf = new ProxyFactory() {{setTargetSource(targetSource);setProxyTargetClass(true);}};
+		InterceptedBeanInterceptor interceptor = new InterceptedBeanInterceptor(beanFactory, metaData, bean, beanName);
+		pf.addAdvice(interceptor);
+		pf.addInterface(InterceptorProxyInspector.class);
+		Object proxy = pf.getProxy();
+		return proxy;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-//		if (chainingStrategy == null) {
-//			chainingStrategy = new SimpleDecoratorChainingStrategy();
-//		}
+	}
+
+	@Override
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
 	}
 
 }

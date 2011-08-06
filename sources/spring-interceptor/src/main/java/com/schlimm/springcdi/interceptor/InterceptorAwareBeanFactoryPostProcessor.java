@@ -8,6 +8,7 @@ import com.schlimm.springcdi.interceptor.strategies.InterceptorResolutionStrateg
 
 public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
+	@SuppressWarnings("unused")
 	private InterceptorResolutionStrategy interceptorResolutionStrategy;
 	
 	@Override
