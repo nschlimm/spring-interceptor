@@ -42,14 +42,6 @@ public abstract class InterceptorInfo {
 	 */
 	protected List<Method> interceptedMethods = new ArrayList<Method>();
 
-	public InterceptorInfo(BeanDefinitionHolder beanDefinitionHolder, List<InterceptedBusinessMethod> targetBusinessMethods) {
-		Assert.isInstanceOf(AnnotatedBeanDefinition.class, beanDefinitionHolder.getBeanDefinition());
-		this.beanDefinitionHolder = beanDefinitionHolder;
-		this.annotationMetadata = ((AnnotatedBeanDefinition) beanDefinitionHolder.getBeanDefinition()).getMetadata();
-		resolveInterceptorMethods();
-		resolveInterceptorBindings();
-	}
-
 	private void resolveInterceptorBindings() {
 		Set<String> annotationTypes = annotationMetadata.getAnnotationTypes();
 		for (String annotationType : annotationTypes) {
@@ -65,7 +57,11 @@ public abstract class InterceptorInfo {
 	protected abstract void resolveInterceptorMethods();
 
 	public InterceptorInfo(BeanDefinitionHolder beanDefinitionHolder) {
-		this(beanDefinitionHolder, null);
+		Assert.isInstanceOf(AnnotatedBeanDefinition.class, beanDefinitionHolder.getBeanDefinition());
+		this.beanDefinitionHolder = beanDefinitionHolder;
+		this.annotationMetadata = ((AnnotatedBeanDefinition) beanDefinitionHolder.getBeanDefinition()).getMetadata();
+		resolveInterceptorMethods();
+		resolveInterceptorBindings();
 	}
 
 	public BeanDefinitionHolder getBeanDefinitionHolder() {

@@ -13,9 +13,10 @@ import org.springframework.beans.factory.support.AutowireCandidateResolver;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
+import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
+
 /**
- * Class implements the wiring rules for autowiring CDI decorators when {@link DecoratorAwareBeanFactoryPostProcessor}
- * mode is set to 'processor'.
+ * Class implements the wiring rules for autowiring CDI interceptors.
  * 
  * @author Niklas Schlimm
  * 
@@ -23,10 +24,8 @@ import org.springframework.util.Assert;
 @SuppressWarnings("unused")
 public class BeanPostProcessorCDIAutowiringRules implements InterceptorAutowiringRules {
 
-	private AutowireCandidateResolver resolver;
-
-	private ConfigurableListableBeanFactory beanFactory;
-
+	private InterceptorMetaDataBean metaData;
+	
 	public BeanPostProcessorCDIAutowiringRules() {
 		super();
 	}
@@ -41,9 +40,6 @@ public class BeanPostProcessorCDIAutowiringRules implements InterceptorAutowirin
 
 	@Override
 	public boolean applyInterceptorAutowiringRules(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
-//		if (metaData.isKnowDecorator(bdHolder.getBeanName())) {
-//			return false;
-//		}
 		return true;
 	}
 }

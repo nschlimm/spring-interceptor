@@ -41,14 +41,14 @@ public class InterceptedBeanInterceptorTest_ClassLevelBindings {
 	
 	private Method sayGoodBye;	
 	
-	private InterceptedBeanInterceptor interceptor;
+	private InterceptedBeanProxyAdvice interceptor;
 
 
 	@Before
 	public void setUp() throws Exception {
 		classLevelBindingsBeanName = "simple_MyServiceInterface_Impl";
 		classLevelBindingsBean = (Simple_MyServiceInterface_Impl) beanFactory.getBean(classLevelBindingsBeanName);
-		interceptor = new InterceptedBeanInterceptor(beanFactory, new InterceptorMetaDataBean(new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory)), classLevelBindingsBean,
+		interceptor = new InterceptedBeanProxyAdvice(beanFactory, new InterceptorMetaDataBean(new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory)), classLevelBindingsBean,
 				classLevelBindingsBeanName);
 		sayHelloWithoutArgs = Simple_MyServiceInterface_Impl.class.getMethod("sayHello", new Class[] {});
 		sayHelloWithArgs = Simple_MyServiceInterface_Impl.class.getMethod("sayHello", new Class[] {String.class});

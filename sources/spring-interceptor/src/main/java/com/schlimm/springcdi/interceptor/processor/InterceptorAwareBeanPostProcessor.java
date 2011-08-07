@@ -14,7 +14,7 @@ import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
  * {@link BeanPostProcessor} that applies the JSR-299 decorator pattern to the Spring beans.
  * 
  * If the processed bean is a decorated bean, then this {@link BeanPostProcessor} returns a CGLIB proxy for that bean. Uses a
- * {@link JSR318InterceptorMethodAdapter} to delegate calls to that given delegate bean to the decorator chain.
+ * {@link InterceptorMethodAdapter} to delegate calls to that given delegate bean to the decorator chain.
  * 
  * @author Niklas Schlimm
  * 
@@ -52,7 +52,7 @@ public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor, Ini
 	private Object createProxyForBean(final String beanName, final Object bean) {
 		final SimpleBeanTargetSource targetSource = new SimpleBeanTargetSource() {{setTargetBeanName(beanName);setTargetClass(bean.getClass());setBeanFactory(beanFactory);}};
 		ProxyFactory pf = new ProxyFactory() {{setTargetSource(targetSource);setProxyTargetClass(true);}};
-		InterceptedBeanInterceptor interceptor = new InterceptedBeanInterceptor(beanFactory, metaData, bean, beanName);
+		InterceptedBeanProxyAdvice interceptor = new InterceptedBeanProxyAdvice(beanFactory, metaData, bean, beanName);
 		pf.addAdvice(interceptor);
 		pf.addInterface(InterceptorProxyInspector.class);
 		Object proxy = pf.getProxy();

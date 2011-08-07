@@ -11,30 +11,22 @@ public class MethodInvocationWrapper implements InvocationContext {
 
 	private MethodInvocation methodInvocation;
 	
-	private Map<String, Object> contextData;
-	
 	public MethodInvocationWrapper(MethodInvocation methodInvocation) {
 		super();
 		this.methodInvocation = methodInvocation;
 	}
 
-	public MethodInvocationWrapper(MethodInvocation methodInvocation, Map<String, Object> contextData) {
-		super();
-		this.methodInvocation = methodInvocation;
-		this.contextData = contextData;
-	}
-
 	@Override
 	public Map<String, Object> getContextData() {
-		return contextData;
+		return InterceptedBeanProxyAdvice.getCurrentContextData();
 	}
 	
 	public void addAllContextData(Map<String, Object> contextData) {
-		this.contextData.putAll(contextData);
+		this.getContextData().putAll(contextData);
 	}
 	
 	public void addContextData(String name, Object value) {
-		contextData.put(name, value);
+		getContextData().put(name, value);
 	}
 	
 	@Override

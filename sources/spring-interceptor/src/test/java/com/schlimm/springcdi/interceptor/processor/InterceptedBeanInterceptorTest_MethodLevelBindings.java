@@ -41,18 +41,19 @@ public class InterceptedBeanInterceptorTest_MethodLevelBindings {
 	
 	private Method sayGoodBye;	
 	
-	private InterceptedBeanInterceptor interceptor;
+	private InterceptedBeanProxyAdvice interceptor;
 
 
 	@Before
 	public void setUp() throws Exception {
 		methodLevelBindingsBeanName = "simple_MyServiceInterface_Impl2";
 		methodLevelBindingsBean = (Simple_MyServiceInterface_Impl2) beanFactory.getBean(methodLevelBindingsBeanName);
-		interceptor = new InterceptedBeanInterceptor(beanFactory, new InterceptorMetaDataBean(new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory)), methodLevelBindingsBean,
+		interceptor = new InterceptedBeanProxyAdvice(beanFactory, new InterceptorMetaDataBean(new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory)), methodLevelBindingsBean,
 				methodLevelBindingsBeanName);
 		sayHelloWithoutArgs = Simple_MyServiceInterface_Impl2.class.getMethod("sayHello", new Class[] {});
 		sayHelloWithArgs = Simple_MyServiceInterface_Impl2.class.getMethod("sayHello", new Class[] {String.class});
 		sayGoodBye = Simple_MyServiceInterface_Impl2.class.getMethod("sayGoodBye", new Class[] {});
+		InterceptedBeanProxyAdvice.resetProxyCache();
 	}
 
 	@Test
@@ -92,7 +93,39 @@ public class InterceptedBeanInterceptorTest_MethodLevelBindings {
 		expect(invocation.getArguments()).andReturn(new Object[]{});
 		replay(invocation);
 		interceptor.invoke(invocation);
-		Assert.assertTrue(interceptor.getCurrentContextData().size()==1);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getCurrentContextData().size()==1);
 		verify(invocation);
 	}
+	
+	@Test
+	public void testGetProxy_newProxy() throws Throwable {
+		MethodInvocation invocation = createMock(MethodInvocation.class);
+		expect(invocation.getMethod()).andReturn(sayHelloWithoutArgs).anyTimes();
+		replay(invocation);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getProxyCache().size()==0);
+		interceptor.getProxy(invocation);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getProxyCache().size()==1);
+		verify(invocation);
+	}
+	
+	@Test
+	public void testGetProxy_cachedProxy() throws Throwable {
+		MethodInvocation invocation = createMock(MethodInvocation.class);
+		expect(invocation.getMethod()).andReturn(sayHelloWithoutArgs).times(3); // three calls to getMethod with cold cache
+		replay(invocation);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getProxyCache().size()==0);
+		Object newProxy = interceptor.getProxy(invocation);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getProxyCache().size()==1);
+		verify(invocation);
+		// again, now proxy chould be cached
+		invocation = createMock(MethodInvocation.class);
+		expect(invocation.getMethod()).andReturn(sayHelloWithoutArgs).times(2); // three calls to getMethod if method is caches
+		replay(invocation);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getProxyCache().size()==1);
+		Object cachedProxy = interceptor.getProxy(invocation);
+		Assert.assertTrue(InterceptedBeanProxyAdvice.getProxyCache().size()==1);
+		Assert.assertTrue(newProxy.equals(cachedProxy));
+		verify(invocation);
+	}
+	
 }

@@ -15,28 +15,32 @@ import com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcesso
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
 
-public class InterceptedBeanInterceptor implements MethodInterceptor {
+public class InterceptedBeanProxyAdvice implements MethodInterceptor {
 
 	private BeanFactory beanFactory;
-	
+
 	private InterceptorMetaDataBean metaDataBean;
-	
+
 	private Object targetBean;
-	
+
 	private String beanName;
-	
+
 	private Method getInterceptor_Method = null;
-	
-	private Map<String, Object> currentContextData = new HashMap<String, Object>();
-	
-	public InterceptedBeanInterceptor(BeanFactory beanFactory, InterceptorMetaDataBean metaDataBean, Object targetBean, String beanName) {
+
+	private static ThreadLocal<Map<String, Object>> currentContextData = new ThreadLocal<Map<String, Object>>();
+
+	private static Map<Method, Object> proxyCache = new HashMap<Method, Object>();
+
+	private Object mutex = new Object();
+
+	public InterceptedBeanProxyAdvice(BeanFactory beanFactory, InterceptorMetaDataBean metaDataBean, Object targetBean, String beanName) {
 		super();
 		this.beanFactory = beanFactory;
 		this.metaDataBean = metaDataBean;
 		this.targetBean = targetBean;
 		this.beanName = beanName;
 		try {
-			getInterceptor_Method = InterceptorProxyInspector.class.getMethod("getInterceptor", new Class[]{});
+			getInterceptor_Method = InterceptorProxyInspector.class.getMethod("getInterceptor", new Class[] {});
 		} catch (Exception e) {
 			throw new InterceptorAwareBeanFactoryPostProcessorException("Could not instintiate interceptor!", e);
 		}
@@ -46,11 +50,24 @@ public class InterceptedBeanInterceptor implements MethodInterceptor {
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		if (getInterceptor_Method.equals(invocation.getMethod()))
 			return this;
-		currentContextData.clear();
-		List<InterceptorInfo> interceptors = getInterceptors(invocation);
-		Object proxy = createProxyWithInterceptors(interceptors, currentContextData);
+		currentContextData.set(new HashMap<String, Object>());
+		Object proxy = getProxy(invocation);
 		Object retVal = performCall(invocation, proxy);
 		return retVal;
+	}
+
+	public Object getProxy(MethodInvocation invocation) {
+		Object proxy;
+		if (getProxyCache().containsKey(invocation.getMethod())) {
+			proxy = getProxyCache().get(invocation.getMethod());
+		} else {
+			synchronized (mutex) {
+				List<InterceptorInfo> interceptors = getInterceptors(invocation);
+				proxy = createProxyWithInterceptors(interceptors);
+				getProxyCache().put(invocation.getMethod(), proxy);
+			}
+		}
+		return proxy;
 	}
 
 	public List<InterceptorInfo> getInterceptors(MethodInvocation invocation) {
@@ -61,13 +78,13 @@ public class InterceptedBeanInterceptor implements MethodInterceptor {
 		return ReflectionUtils.invokeMethod(invocation.getMethod(), proxy, invocation.getArguments());
 	}
 
-	public Object createProxyWithInterceptors(List<InterceptorInfo> interceptors, Map<String, Object> callContextData) {
+	public Object createProxyWithInterceptors(List<InterceptorInfo> interceptors) {
 		ProxyFactory pf = new ProxyFactory();
 		pf.setTarget(targetBean);
 		for (InterceptorInfo interceptorInfo : interceptors) {
 			Object interceptor = beanFactory.getBean(interceptorInfo.getBeanDefinitionHolder().getBeanName());
 			for (Method method : interceptorInfo.getInterceptorMethods()) {
-				JSR318InterceptorMethodAdapter adapter = new JSR318InterceptorMethodAdapter(method, interceptor, callContextData);
+				InterceptorMethodAdapter adapter = new InterceptorMethodAdapter(method, interceptor);
 				pf.addAdvice(adapter);
 			}
 		}
@@ -75,8 +92,16 @@ public class InterceptedBeanInterceptor implements MethodInterceptor {
 		return proxy;
 	}
 
-	public Map<String, Object> getCurrentContextData() {
-		return currentContextData;
+	public static Map<String, Object> getCurrentContextData() {
+		return currentContextData.get();
+	}
+
+	public static Map<Method, Object> getProxyCache() {
+		return proxyCache;
+	}
+
+	public static synchronized void resetProxyCache() {
+		proxyCache.clear();
 	}
 
 }
