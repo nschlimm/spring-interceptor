@@ -3,7 +3,6 @@ package com.schlimm.springcdi.interceptor.processor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.SimpleBeanTargetSource;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -11,15 +10,15 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
 
 /**
- * {@link BeanPostProcessor} that applies the JSR-299 decorator pattern to the Spring beans.
+ * {@link BeanPostProcessor} that applies the JSR-299 interceptor pattern to the Spring beans.
  * 
- * If the processed bean is a decorated bean, then this {@link BeanPostProcessor} returns a CGLIB proxy for that bean. Uses a
- * {@link InterceptorMethodAdapter} to delegate calls to that given delegate bean to the decorator chain.
+ * If the processed bean is an intercepted bean, then this {@link BeanPostProcessor} returns a CGLIB proxy for that bean. Uses a
+ * {@link InterceptedBeanProxyAdvice} to delegate calls to interceptors for a specific method call.
  * 
  * @author Niklas Schlimm
  * 
  */
-public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor, InitializingBean {
+public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor {
 
 	@Autowired
 	private InterceptorMetaDataBean metaData;
@@ -57,10 +56,6 @@ public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor, Ini
 		pf.addInterface(InterceptorProxyInspector.class);
 		Object proxy = pf.getProxy();
 		return proxy;
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
 	}
 
 	@Override
