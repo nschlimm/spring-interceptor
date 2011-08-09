@@ -1,8 +1,12 @@
 package com.schlimm.springcdi.interceptor;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.enterprise.inject.Stereotype;
+import javax.interceptor.InterceptorBinding;
 
 import org.springframework.util.Assert;
 
@@ -47,5 +51,22 @@ public class InterceptorModuleUtils {
 		return methods;
 	}
 
-	
+	public static boolean isInterceptorBinding(Class<? extends Annotation> candidate) {
+		for (Annotation annotation : candidate.getAnnotations()) {
+			if (annotation.annotationType().equals(InterceptorBinding.class)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isStereotype(Class<? extends Annotation> candidate) {
+		for (Annotation annotation : candidate.getAnnotations()) {
+			if (annotation.annotationType().equals(Stereotype.class)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

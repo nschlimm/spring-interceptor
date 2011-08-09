@@ -118,7 +118,8 @@ public abstract class InterceptorInfo {
 	}
 
 	public void addClassLevelInterception(String beanName) {
-		classLevelInterceptions.add(beanName);
+		if (!classLevelInterceptions.contains(beanName))
+			classLevelInterceptions.add(beanName);
 	}
 
 	public void addInterceptedMethod(Method method) {
@@ -150,6 +151,10 @@ public abstract class InterceptorInfo {
 
 	public Set<Method> getInterceptorMethods() {
 		return interceptorMethods;
+	}
+
+	public String toString() {
+		return beanDefinitionHolder.toString();
 	}
 
 }
