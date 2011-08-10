@@ -53,7 +53,7 @@ public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor {
 		ProxyFactory pf = new ProxyFactory() {{setTargetSource(targetSource);setProxyTargetClass(true);}};
 		InterceptedBeanProxyAdvice interceptor = new InterceptedBeanProxyAdvice(beanFactory, metaData, bean, beanName);
 		pf.addAdvice(interceptor);
-		pf.addInterface(InterceptorProxyInspector.class);
+		pf.addInterface(InterceptedBeanProxyAdviceInspector.class);
 		Object proxy = pf.getProxy();
 		return proxy;
 	}

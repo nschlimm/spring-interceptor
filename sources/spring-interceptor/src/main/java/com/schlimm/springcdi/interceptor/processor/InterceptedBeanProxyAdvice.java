@@ -40,7 +40,7 @@ public class InterceptedBeanProxyAdvice implements MethodInterceptor {
 		this.targetBean = targetBean;
 		this.beanName = beanName;
 		try {
-			getInterceptor_Method = InterceptorProxyInspector.class.getMethod("getInterceptor", new Class[] {});
+			getInterceptor_Method = InterceptedBeanProxyAdviceInspector.class.getMethod("getInterceptor", new Class[] {});
 		} catch (Exception e) {
 			throw new InterceptorAwareBeanFactoryPostProcessorException("Could not instintiate interceptor!", e);
 		}

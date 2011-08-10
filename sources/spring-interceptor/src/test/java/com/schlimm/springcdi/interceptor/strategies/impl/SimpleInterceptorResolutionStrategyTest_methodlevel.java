@@ -30,12 +30,18 @@ public class SimpleInterceptorResolutionStrategyTest_methodlevel {
 	public void testCoundInterceptedBeans() {
 		Assert.assertTrue(new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory).get(0).getInterceptedBeans().size()==2);
 	}
-	
+
+	/**
+	 * Class level interceptor bindings apply to all methods -> all methods listed in intercepted methods
+	 */
 	@Test
 	public void testCountInterceptedBusinessMethods() {
-		Assert.assertTrue(((MethodInterceptorInfo)new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory).get(0)).getInterceptedMethods().size()==2);
+		Assert.assertTrue(((MethodInterceptorInfo)new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory).get(0)).getInterceptedMethods().size()==14);
 	}
 	
+	/**
+	 * One class level interceptor binding -> one class level interception
+	 */
 	@Test
 	public void testCountClassLevelInterceptions() {
 		Assert.assertTrue(((MethodInterceptorInfo)new SimpleInterceptorResolutionStrategy().resolveRegisteredInterceptors(beanFactory).get(0)).getClassLevelInterceptions().size()==1);

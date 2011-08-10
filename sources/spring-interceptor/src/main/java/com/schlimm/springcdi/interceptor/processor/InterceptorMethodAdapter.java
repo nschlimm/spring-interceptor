@@ -28,4 +28,12 @@ public class InterceptorMethodAdapter implements MethodInterceptor {
 		return retVal;
 	}
 
+	public Method getJsr318InterceptorMethod() {
+		return jsr318InterceptorMethod;
+	}
+
+	public Object getInterceptor() {
+		return interceptor;
+	}
+
 }

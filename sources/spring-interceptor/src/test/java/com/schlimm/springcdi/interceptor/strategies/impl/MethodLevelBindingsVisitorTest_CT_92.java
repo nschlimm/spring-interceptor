@@ -14,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.schlimm.springcdi.interceptor.InterceptorModuleUtils;
+import com.schlimm.springcdi.interceptor.ct._92_C1.interceptors.SecurityInterceptor;
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.model.MethodInterceptorInfo;
 
@@ -38,6 +39,8 @@ public class MethodLevelBindingsVisitorTest_CT_92 {
 
 	private BeanDefinition impl3Definition;
 	
+	private BeanDefinition impl4Definition;
+	
 	@Before
 	public void setUp() {
 		transactionInterceptor = new MethodInterceptorInfo(new BeanDefinitionHolder(((DefaultListableBeanFactory) beanFactory).getBeanDefinition("transactionInterceptor"), "transactionInterceptor"));
@@ -45,6 +48,7 @@ public class MethodLevelBindingsVisitorTest_CT_92 {
 		oldSecurityInterceptor = new MethodInterceptorInfo(new BeanDefinitionHolder(((DefaultListableBeanFactory) beanFactory).getBeanDefinition("oldSecurityInterceptor"), "oldSecurityInterceptor"));
 		vipInterceptor = new MethodInterceptorInfo(new BeanDefinitionHolder(((DefaultListableBeanFactory) beanFactory).getBeanDefinition("VIPSecurityInterceptor"), "VIPSecurityInterceptor"));
 		impl3Definition = beanFactory.getBeanDefinition("CT92_TrialService_Impl3");
+		impl4Definition = beanFactory.getBeanDefinition("CT92_TrialService_Impl4");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -79,6 +83,17 @@ public class MethodLevelBindingsVisitorTest_CT_92 {
 		Assert.assertTrue(vipInterceptor.matches("CT92_TrialService_Impl3", InterceptorModuleUtils.getClass_forName(impl3Definition.getBeanClassName()).getMethod("sayHello", new Class[]{String.class})));
 		Assert.assertTrue(oldSecurityInterceptor.matches("CT92_TrialService_Impl3", InterceptorModuleUtils.getClass_forName(impl3Definition.getBeanClassName()).getMethod("sayHello", new Class[]{})));
 		Assert.assertTrue(transactionInterceptor.matches("CT92_TrialService_Impl3", InterceptorModuleUtils.getClass_forName(impl3Definition.getBeanClassName()).getMethod("sayHello", new Class[]{})));
+	}
+
+	/**
+	 * Joint class level @Transactional and method level @Secured binding results in {@link SecurityInterceptor} application
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testVisit_Impl4_sayHello_ExpectSecurtityInterceptors() throws Exception {
+		visitor.visit(securityInterceptor, new BeanDefinitionHolder(impl4Definition, "CT92_TrialService_Impl4"));
+		Assert.assertTrue(securityInterceptor.matches("CT92_TrialService_Impl4", InterceptorModuleUtils.getClass_forName(impl4Definition.getBeanClassName()).getMethod("sayHello", new Class[]{})));
 	}
 	
 }

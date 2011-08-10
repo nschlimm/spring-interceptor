@@ -33,24 +33,44 @@ public class InterceptorMetaDataBeanTest {
 		metaDataBean = new InterceptorMetaDataBean(interceptorResolutionStrategy.resolveRegisteredInterceptors(beanFactory));
 	}
 	
+	/**
+	 * Class level interceptor found
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
 	@Test
 	public void testGetMatchingInterceptors_beanName() throws SecurityException, NoSuchMethodException {
 		Assert.assertTrue(metaDataBean.getMatchingInterceptors("simple_MyServiceInterface_Impl", this.getClass().getDeclaredMethods()[0]).size()==1);
 	}
 	
+	/**
+	 * No class level interceptor, but a method level declaration
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
 	@Test
 	public void testGetMatchingInterceptors_methodName() throws SecurityException, NoSuchMethodException {
 		Assert.assertTrue(metaDataBean.getMatchingInterceptors("", Simple_MyServiceInterface_Impl2.class.getDeclaredMethod("sayHello", new Class[]{})).size()==1);
 	}
 	
+	/**
+	 * There is no class level interceptor for the bean impl2
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
 	@Test
 	public void testGetMatchingInterceptors_beanName_negative() throws SecurityException, NoSuchMethodException {
 		Assert.assertTrue(metaDataBean.getMatchingInterceptors("simple_MyServiceInterface_Impl2", this.getClass().getDeclaredMethods()[0]).size()==0);
 	}
 	
+	/**
+	 * Class level interceptor bindings apply to all methods
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 */
 	@Test
 	public void testGetMatchingInterceptors_methodName_negative() throws SecurityException, NoSuchMethodException {
-		Assert.assertTrue(metaDataBean.getMatchingInterceptors("", Simple_MyServiceInterface_Impl.class.getDeclaredMethod("sayHello", new Class[]{})).size()==0);
+		Assert.assertTrue(metaDataBean.getMatchingInterceptors("", Simple_MyServiceInterface_Impl.class.getDeclaredMethod("sayHello", new Class[]{})).size()==1);
 	}
 	
 }

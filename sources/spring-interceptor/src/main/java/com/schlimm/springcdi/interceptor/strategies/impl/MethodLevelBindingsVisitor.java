@@ -36,6 +36,10 @@ public class MethodLevelBindingsVisitor implements InterceptorInfoVisitor {
 				if (AnnotationUtils.findAnnotation(method, InterceptorModuleUtils.getClass_forName(binding)) != null) {
 					unmatchedBindings.remove(binding);
 				}
+				// Class level annotations apply to all methods
+				if (ClassLevelBindingsVisitor.scanAnnotations(InterceptorModuleUtils.getClass_forName(abd.getBeanClassName()), InterceptorModuleUtils.getClass_forName(binding))!=null) {
+					unmatchedBindings.remove(binding);
+				}
 			}
 			if (unmatchedBindings.size()==0) {
 				interceptedMethods.add(method);

@@ -12,7 +12,9 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
 import com.schlimm.springcdi.interceptor.processor.InterceptorAwareBeanPostProcessor;
+import com.schlimm.springcdi.interceptor.strategies.InterceptorOrderingStrategy;
 import com.schlimm.springcdi.interceptor.strategies.InterceptorResolutionStrategy;
+import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorOrderingStrategy;
 import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorResolutionStrategy;
 
 public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPostProcessor, InitializingBean {
@@ -21,6 +23,8 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 
 	private InterceptorResolutionStrategy interceptorResolutionStrategy;
 
+	private InterceptorOrderingStrategy interceptorOrderingStrategy;
+	
 	public InterceptorAwareBeanFactoryPostProcessor() {
 		super();
 	}
@@ -42,6 +46,7 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 
 	public InterceptorMetaDataBean createAndRegisterMetaDataBean(ConfigurableListableBeanFactory beanFactory) {
 		List<InterceptorInfo> interceptors = interceptorResolutionStrategy.resolveRegisteredInterceptors(beanFactory);
+		interceptors = interceptorOrderingStrategy.orderInterceptors(beanFactory, interceptors);
 		InterceptorMetaDataBean metaDataBean = new InterceptorMetaDataBean(interceptors);
 		beanFactory.registerSingleton(INTERCEPTOR_META_DATA_BEAN, metaDataBean);
 		return metaDataBean;
@@ -51,6 +56,9 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 	public void afterPropertiesSet() throws Exception {
 		if (interceptorResolutionStrategy == null) {
 			interceptorResolutionStrategy = new SimpleInterceptorResolutionStrategy();
+		}
+		if (interceptorOrderingStrategy == null) {
+			interceptorOrderingStrategy = new SimpleInterceptorOrderingStrategy();
 		}
 	}
 
