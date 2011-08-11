@@ -4,15 +4,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 public class InterceptorMetaDataBean {
 	
 	private List<InterceptorInfo> interceptors;
 	
-	@Autowired
-	private InterceptorOrder interceptorOrder;
-
 	public InterceptorMetaDataBean(List<InterceptorInfo> interceptors) {
 		super();
 		this.interceptors = interceptors;
@@ -43,14 +38,6 @@ public class InterceptorMetaDataBean {
 
 	public void setInterceptors(List<InterceptorInfo> interceptors) {
 		this.interceptors = interceptors;
-	}
-
-	public void setInterceptorOrder(InterceptorOrder interceptorOrder) {
-		this.interceptorOrder = interceptorOrder;
-	}
-
-	public InterceptorOrder getInterceptorOrder() {
-		return interceptorOrder;
 	}
 
 }

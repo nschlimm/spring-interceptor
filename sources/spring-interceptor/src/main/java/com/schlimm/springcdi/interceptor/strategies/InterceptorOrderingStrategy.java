@@ -8,6 +8,7 @@ import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 
 public interface InterceptorOrderingStrategy {
 
-	List<InterceptorInfo> orderInterceptors(BeanFactory beanFactory, List<InterceptorInfo> interceptors);
+	@SuppressWarnings("rawtypes")
+	List<InterceptorInfo> orderInterceptors(BeanFactory beanFactory, List<InterceptorInfo> interceptors, List<Class> configuredOrder);
 
 }

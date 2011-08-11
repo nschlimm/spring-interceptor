@@ -4,30 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
-import com.schlimm.springcdi.interceptor.model.InterceptorOrder;
 import com.schlimm.springcdi.interceptor.strategies.InterceptorOrderingStrategy;
 
 public class SimpleInterceptorOrderingStrategy implements InterceptorOrderingStrategy {
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public List<InterceptorInfo> orderInterceptors(BeanFactory beanFactory, List<InterceptorInfo> interceptors) {
-		InterceptorOrder orderBean = null;
-		if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors((ConfigurableListableBeanFactory)beanFactory, InterceptorOrder.class).length>0) {
-			orderBean = BeanFactoryUtils.beanOfType((ConfigurableListableBeanFactory)beanFactory, InterceptorOrder.class);
-			return sortInterceptors(orderBean, interceptors);
+	public List<InterceptorInfo> orderInterceptors(BeanFactory beanFactory, List<InterceptorInfo> interceptors, List<Class> configuredOrder) {
+		if (configuredOrder!=null && configuredOrder.size() > 0) {
+			return sortInterceptors(configuredOrder, interceptors);
 		} else {
 			return interceptors;
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	private List<InterceptorInfo> sortInterceptors(InterceptorOrder orderBean, List<InterceptorInfo> unsortedInterceptors) {
+	private List<InterceptorInfo> sortInterceptors(List<Class> configuredOrder, List<InterceptorInfo> unsortedInterceptors) {
 		List<InterceptorInfo> sortedInterceptors = new ArrayList<InterceptorInfo>();
-		for (Class interceptorClass : orderBean.getOrdererInterceptorClasses()) {
+		for (Class interceptorClass : configuredOrder) {
 			for (InterceptorInfo interceptorInfo : unsortedInterceptors) {
 				if (interceptorInfo.getBeanDefinitionHolder().getBeanDefinition().getBeanClassName().equals(interceptorClass.getName())) {
 					sortedInterceptors.add(interceptorInfo);

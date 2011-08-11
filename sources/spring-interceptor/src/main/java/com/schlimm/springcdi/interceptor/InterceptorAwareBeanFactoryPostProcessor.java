@@ -1,5 +1,6 @@
 package com.schlimm.springcdi.interceptor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeansException;
@@ -17,6 +18,7 @@ import com.schlimm.springcdi.interceptor.strategies.InterceptorResolutionStrateg
 import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorOrderingStrategy;
 import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorResolutionStrategy;
 
+@SuppressWarnings("rawtypes")
 public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPostProcessor, InitializingBean {
 
 	private static final String INTERCEPTOR_META_DATA_BEAN = "interceptorMetaDataBean";
@@ -24,6 +26,8 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 	private InterceptorResolutionStrategy interceptorResolutionStrategy;
 
 	private InterceptorOrderingStrategy interceptorOrderingStrategy;
+	
+	private List<Class> interceptorOrder = new ArrayList<Class>();
 	
 	public InterceptorAwareBeanFactoryPostProcessor() {
 		super();
@@ -46,7 +50,7 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 
 	public InterceptorMetaDataBean createAndRegisterMetaDataBean(ConfigurableListableBeanFactory beanFactory) {
 		List<InterceptorInfo> interceptors = interceptorResolutionStrategy.resolveRegisteredInterceptors(beanFactory);
-		interceptors = interceptorOrderingStrategy.orderInterceptors(beanFactory, interceptors);
+		interceptors = interceptorOrderingStrategy.orderInterceptors(beanFactory, interceptors, getInterceptorOrder());
 		InterceptorMetaDataBean metaDataBean = new InterceptorMetaDataBean(interceptors);
 		beanFactory.registerSingleton(INTERCEPTOR_META_DATA_BEAN, metaDataBean);
 		return metaDataBean;
@@ -60,6 +64,14 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 		if (interceptorOrderingStrategy == null) {
 			interceptorOrderingStrategy = new SimpleInterceptorOrderingStrategy();
 		}
+	}
+
+	public void setInterceptorOrder(List<Class> interceptorOrder) {
+		this.interceptorOrder = interceptorOrder;
+	}
+
+	public List<Class> getInterceptorOrder() {
+		return interceptorOrder;
 	}
 
 }

@@ -21,10 +21,8 @@
 			expression="javax.interceptor.Interceptor" />
 	</context:component-scan>
 
-	<bean class="com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcessor" />
-
-	<bean class="com.schlimm.springcdi.interceptor.model.InterceptorOrder">
-		<property name="ordererInterceptorClasses">
+	<bean class="com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcessor">
+		<property name="interceptorOrder">
 			<list>
 				<value>com.schlimm.springcdi.interceptor.ct._91_C1.interceptors.TransactionInterceptor</value>
 				<value>com.schlimm.springcdi.interceptor.ct._92_C1.interceptors.OldSecurityInterceptor</value>
@@ -33,5 +31,6 @@
 			</list>
 		</property>
 	</bean>
+
 
 </beans>
