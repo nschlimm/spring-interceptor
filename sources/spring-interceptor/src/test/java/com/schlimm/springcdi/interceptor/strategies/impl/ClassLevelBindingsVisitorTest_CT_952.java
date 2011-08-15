@@ -51,4 +51,10 @@ public class ClassLevelBindingsVisitorTest_CT_952 {
 		Assert.assertTrue(!clerkCompetencer.isInterceptingBean("CT952_TrialServiceImpl1"));
 	}
 
+	@Test
+	public void testVisit_Impl1_OneClassLevelInterception() {
+		visitor.visit(managementComptetence, new BeanDefinitionHolder(impl1Definition, "CT952_TrialServiceImpl1"));
+		Assert.assertTrue(managementComptetence.getClassLevelInterceptions().size()==1);
+	}
+	
 }

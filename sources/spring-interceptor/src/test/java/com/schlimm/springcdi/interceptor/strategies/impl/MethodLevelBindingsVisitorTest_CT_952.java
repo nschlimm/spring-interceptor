@@ -13,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.schlimm.springcdi.interceptor.ct._952_C1.test1.CT952_TrialServiceImpl2;
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.model.MethodInterceptorInfo;
 
@@ -29,7 +30,7 @@ public class MethodLevelBindingsVisitorTest_CT_952 {
 
 	private InterceptorInfo clerkCompetencer;
 
-	private BeanDefinition impl1Definition;
+	private BeanDefinition impl2Definition;
 	
 	private MethodLevelBindingsVisitor visitor = new MethodLevelBindingsVisitor();
 	
@@ -38,15 +39,33 @@ public class MethodLevelBindingsVisitorTest_CT_952 {
 		clerkCompetencer = new MethodInterceptorInfo(new BeanDefinitionHolder(((DefaultListableBeanFactory) beanFactory).getBeanDefinition("clerkCompetenceInterceptor"), "clerkCompetenceInterceptor"));
 		managementComptetence = new MethodInterceptorInfo(new BeanDefinitionHolder(((DefaultListableBeanFactory) beanFactory).getBeanDefinition("managementCompetenceInterceptor"),
 				"managementCompetenceInterceptor"));
-		impl1Definition = beanFactory.getBeanDefinition("CT952_TrialServiceImpl2");
+		impl2Definition = beanFactory.getBeanDefinition("CT952_TrialServiceImpl2");
 	}
 
 	@Test
-	public void testVisit_Impl1_ManagementCompetenceApplied() {
-		visitor.visit(managementComptetence, new BeanDefinitionHolder(impl1Definition, "CT952_TrialServiceImpl2"));
+	public void testVisit_Impl2_ClerkCompetenceApplied() {
+		visitor.visit(managementComptetence, new BeanDefinitionHolder(impl2Definition, "CT952_TrialServiceImpl2"));
 		Assert.assertTrue(!managementComptetence.isInterceptingBean("CT952_TrialServiceImpl2"));
-		visitor.visit(clerkCompetencer, new BeanDefinitionHolder(impl1Definition, "CT952_TrialServiceImpl2"));
+		visitor.visit(clerkCompetencer, new BeanDefinitionHolder(impl2Definition, "CT952_TrialServiceImpl2"));
 		Assert.assertTrue(clerkCompetencer.isInterceptingBean("CT952_TrialServiceImpl2"));
 	}
 
+	@Test
+	public void testVisit_Impl2_OneMethodIntercepted() {
+		visitor.visit(clerkCompetencer, new BeanDefinitionHolder(impl2Definition, "CT952_TrialServiceImpl2"));
+		Assert.assertTrue(clerkCompetencer.getInterceptedMethods().size()==1);
+	}
+	
+	@Test
+	public void testVisit_Impl2_sayHelloIntercepted_byClerInterceptor() throws SecurityException, NoSuchMethodException {
+		visitor.visit(clerkCompetencer, new BeanDefinitionHolder(impl2Definition, "CT952_TrialServiceImpl2"));
+		Assert.assertTrue(clerkCompetencer.getInterceptedMethods().contains(CT952_TrialServiceImpl2.class.getMethod("sayHello", new Class[]{})));
+	}
+	
+	@Test
+	public void testVisit_Impl2_sayHelloNotIntercepted_byManagementInterceptor() throws SecurityException, NoSuchMethodException {
+		visitor.visit(managementComptetence, new BeanDefinitionHolder(impl2Definition, "CT952_TrialServiceImpl2"));
+		Assert.assertTrue(!managementComptetence.getInterceptedMethods().contains(CT952_TrialServiceImpl2.class.getMethod("sayHello", new Class[]{})));
+	}
+	
 }
