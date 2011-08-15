@@ -3,9 +3,11 @@ package com.schlimm.springcdi.interceptor.strategies.impl;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
 import com.schlimm.springcdi.interceptor.InterceptorModuleUtils;
@@ -21,12 +23,18 @@ public class ClassLevelBindingsVisitor implements InterceptorInfoVisitor {
 		String bdName = definition.getBeanName();
 		AnnotatedBeanDefinition abd = (AnnotatedBeanDefinition) definition.getBeanDefinition();
 		for (String binding : bindings) {
-			if (abd.getMetadata().hasAnnotation(binding)) {
-				unmatchedBindings.remove(binding);
-			}
 			// scan stereotypes and interceptor bindings recursively to find binding
-			if (scanAnnotations(InterceptorModuleUtils.getClass_forName(abd.getBeanClassName()), InterceptorModuleUtils.getClass_forName(binding))!=null) {
-				unmatchedBindings.remove(binding);
+			Annotation beanAnnotation = scanAnnotations(InterceptorModuleUtils.getClass_forName(abd.getBeanClassName()), InterceptorModuleUtils.getClass_forName(binding));
+			if (beanAnnotation!=null) { // true=bean declares this interceptor binding
+				Map<String, Object> beanAnnotationAttributes = AnnotationUtils.getAnnotationAttributes(beanAnnotation);
+				Map<String, Object> interceptorAttributes = interceptorInfo.getAnnotationAttributes(binding);
+				if (interceptorAttributes!=null && interceptorAttributes.size()>0) {
+					if (ClassLevelBindingsVisitor.matchAttributes(beanAnnotation, beanAnnotationAttributes, interceptorAttributes)) {
+						unmatchedBindings.remove(binding);
+					}
+				} else {
+					unmatchedBindings.remove(binding);
+				}
 			}
 		}
 		// if all declared bindings of the interceptor matched the bean, the interceptor applies on the class level
@@ -34,6 +42,17 @@ public class ClassLevelBindingsVisitor implements InterceptorInfoVisitor {
 			interceptorInfo.addInterceptedBean(bdName);
 			interceptorInfo.addClassLevelInterception(bdName);
 		}
+	}
+
+	public static boolean matchAttributes(Annotation beanAnnotation, Map<String, Object> beanAnnotationAttributes, Map<String, Object> interceptorAttributes) {
+		if (beanAnnotationAttributes.values().size()==interceptorAttributes.values().size()) {
+			for (String key : beanAnnotationAttributes.keySet()) {
+				if (!beanAnnotationAttributes.get(key).equals(interceptorAttributes.get(key))) return false;
+			}
+		} else {
+			return false;
+		}
+		return true;
 	}
 
 	public static <A extends Annotation> A scanAnnotations(Class<?> clazz, Class<A> annotationType) {

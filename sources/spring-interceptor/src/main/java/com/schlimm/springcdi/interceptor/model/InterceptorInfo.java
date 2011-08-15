@@ -156,5 +156,9 @@ public abstract class InterceptorInfo {
 	public String toString() {
 		return beanDefinitionHolder.toString();
 	}
+	
+	public Map<String, Object> getAnnotationAttributes(String annotationType) {
+		return annotationMetadata.getAnnotationAttributes(annotationType);
+	}
 
 }
