@@ -86,7 +86,7 @@ public class MethodLevelBindingsVisitorTest_CT_92 {
 	}
 
 	/**
-	 * Joint class level @Transactional and method level @Secured binding results in {@link SecurityInterceptor} application
+	 * Joint class level @Transactional and method level @RuleSecured binding results in {@link SecurityInterceptor} application
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")

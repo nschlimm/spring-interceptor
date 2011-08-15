@@ -20,7 +20,7 @@ public class SimpleInterceptorTestCase {
 	private CT92_TrialService_Interface someInterceptedBean;
 	
 	/**
-	 * Only old and vip interceptor are applied cause only @Secured is declared
+	 * Only old and vip interceptor are applied cause only @RuleSecured is declared
 	 */
 	@Test
 	public void testSecuredAnnotation_ExpectingOldAndVIP_onSayHello() {
