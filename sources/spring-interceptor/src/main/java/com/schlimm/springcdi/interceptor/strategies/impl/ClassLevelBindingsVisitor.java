@@ -1,9 +1,12 @@
 package com.schlimm.springcdi.interceptor.strategies.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.enterprise.util.Nonbinding;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -45,6 +48,11 @@ public class ClassLevelBindingsVisitor implements InterceptorInfoVisitor {
 	}
 
 	public static boolean matchAttributes(Annotation beanAnnotation, Map<String, Object> beanAnnotationAttributes, Map<String, Object> interceptorAttributes) {
+		for (Method method : beanAnnotation.annotationType().getDeclaredMethods()) {
+			if (method.isAnnotationPresent(Nonbinding.class)){
+				beanAnnotationAttributes.remove(method.getName()); interceptorAttributes.remove(method.getName());
+			}
+		} 
 		if (beanAnnotationAttributes.values().size()==interceptorAttributes.values().size()) {
 			for (String key : beanAnnotationAttributes.keySet()) {
 				if (!beanAnnotationAttributes.get(key).equals(interceptorAttributes.get(key))) return false;
