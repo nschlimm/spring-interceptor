@@ -1,0 +1,6 @@
+com.schlimm.springcdi
+com.schlimm.springcdi.interceptor
+com.schlimm.springcdi.interceptor.model
+com.schlimm.springcdi.interceptor.processor
+com.schlimm.springcdi.interceptor.strategies
+com.schlimm.springcdi.interceptor.strategies.impl
