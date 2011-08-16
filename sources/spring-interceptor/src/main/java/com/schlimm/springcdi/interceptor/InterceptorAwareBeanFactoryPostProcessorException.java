@@ -3,7 +3,7 @@ package com.schlimm.springcdi.interceptor;
 import org.springframework.core.NestedRuntimeException;
 
 /**
- * Exception that is thrown by decorator pattern implementation logic.
+ * Exception that is thrown by interceptor pattern implementation logic.
  * 
  * @author Niklas Schlimm
  *

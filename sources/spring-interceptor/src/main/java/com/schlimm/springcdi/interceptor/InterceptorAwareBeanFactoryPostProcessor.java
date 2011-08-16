@@ -18,17 +18,30 @@ import com.schlimm.springcdi.interceptor.strategies.InterceptorResolutionStrateg
 import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorOrderingStrategy;
 import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorResolutionStrategy;
 
+/**
+ * {@link BeanFactoryPostProcessor} that creates and registers the {@link InterceptorMetaDataBean} and the
+ * {@link InterceptorAwareBeanPostProcessor}.
+ * 
+ * @author Niklas Schlimm
+ * 
+ */
 @SuppressWarnings("rawtypes")
 public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPostProcessor, InitializingBean {
 
 	private static final String INTERCEPTOR_META_DATA_BEAN = "interceptorMetaDataBean";
 
+	/**
+	 * Strategy to resolve available interceptors
+	 */
 	private InterceptorResolutionStrategy interceptorResolutionStrategy;
 
+	/**
+	 * Strategy to order the available interceptors
+	 */
 	private InterceptorOrderingStrategy interceptorOrderingStrategy;
-	
+
 	private List<Class> interceptorOrder = new ArrayList<Class>();
-	
+
 	public InterceptorAwareBeanFactoryPostProcessor() {
 		super();
 	}

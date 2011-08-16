@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.interceptor.InterceptorBinding;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
@@ -15,23 +17,55 @@ import com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcesso
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
 
+/**
+ * {@link MethodInterceptor} that is applied to any intercepted target bean. If a method call to the target bean is intercepted by
+ * user defined JSR 318 interceptors this advice creates a proxy for each target bean method that applies all the user defined JSR
+ * 318 interceptors. The method proxies are cached to maximize performance.
+ * 
+ * Example: Bean ServiceImpl has a method called "sayHello()". The ServiceImpl has an {@link InterceptorBinding} declared that
+ * points to MyJSR318Interceptor. The the logic is as folows: The {@link InterceptedBeanProxyAdvice} is applied to ServiceImpl.
+ * If the sayHello() method is called the {@link InterceptedBeanProxyAdvice} creates a "method proxy", its target is ServiceImpl. 
+ * The methid proxy applies the MyJSR318Interceptor advice. This logic is required 'cause every method on ServiceImple bean
+ * can have different interceptor chains, thus will have different method proxies that apply these chains.
+ * 
+ * @author Niklas Schlimm
+ * 
+ */
 public class InterceptedBeanProxyAdvice implements MethodInterceptor {
 
+	/**
+	 * Bean factory that holds all interceptors
+	 */
 	private BeanFactory beanFactory;
 
+	/**
+	 * Meta data for all registered interceptors
+	 */
 	private InterceptorMetaDataBean metaDataBean;
 
+	/**
+	 * The intercepted bean
+	 */
 	private Object targetBean;
 
+	/**
+	 * The name of the intercepted bean in the {@link BeanFactory}
+	 */
 	private String beanName;
 
-	private Method getInterceptor_Method = null;
-
+	/**
+	 * Thread local context data variable to share context data between JSR 318 interceptors
+	 */
 	private static ThreadLocal<Map<String, Object>> currentContextData = new ThreadLocal<Map<String, Object>>();
 
+	/**
+	 * The proxy cache for all method proxies
+	 */
 	private static Map<Method, Object> proxyCache = new HashMap<Method, Object>();
 
 	private Object mutex = new Object();
+
+	private Method getInterceptor_Method = null;
 
 	public InterceptedBeanProxyAdvice(BeanFactory beanFactory, InterceptorMetaDataBean metaDataBean, Object targetBean, String beanName) {
 		super();
@@ -56,6 +90,14 @@ public class InterceptedBeanProxyAdvice implements MethodInterceptor {
 		return retVal;
 	}
 
+	/**
+	 * Get or create method proxy for the current {@link MethodInvocation} to the intercepted bean.
+	 * 
+	 * @param invocation
+	 *            current invocation
+	 * 
+	 * @return method proxy that has all user defined interceptors applied
+	 */
 	public Object getProxy(MethodInvocation invocation) {
 		Object proxy;
 		if (getProxyCache().containsKey(invocation.getMethod())) {

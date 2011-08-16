@@ -5,9 +5,16 @@ import java.util.List;
 
 import org.springframework.beans.factory.BeanFactory;
 
+import com.schlimm.springcdi.interceptor.InterceptorAwareBeanFactoryPostProcessor;
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
 import com.schlimm.springcdi.interceptor.strategies.InterceptorOrderingStrategy;
 
+/**
+ * Simple ordering strategy that applies the configured order of {@link InterceptorAwareBeanFactoryPostProcessor}.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class SimpleInterceptorOrderingStrategy implements InterceptorOrderingStrategy {
 
 	@SuppressWarnings("rawtypes")

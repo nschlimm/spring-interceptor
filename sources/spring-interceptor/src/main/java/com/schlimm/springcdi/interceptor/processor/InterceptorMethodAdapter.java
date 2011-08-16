@@ -8,6 +8,12 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.util.ReflectionUtils;
 
+/**
+ * CGLIB {@link MethodInterceptor} to JSR318 interceptor bridge.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class InterceptorMethodAdapter implements MethodInterceptor {
 
 	private Method jsr318InterceptorMethod;

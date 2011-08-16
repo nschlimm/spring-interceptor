@@ -7,6 +7,12 @@ import javax.interceptor.InvocationContext;
 
 import org.aopalliance.intercept.MethodInvocation;
 
+/**
+ * {@link MethodInvocation} wrapper that is passed as argument to JSR 318 interceptors.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class MethodInvocationWrapper implements InvocationContext {
 
 	private MethodInvocation methodInvocation;

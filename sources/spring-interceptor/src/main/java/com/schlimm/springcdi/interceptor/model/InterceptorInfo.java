@@ -12,24 +12,51 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InterceptorBinding;
 
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
+/**
+ * Model bean that stores all relevant interceptor information. One bean per interceptor defined in the bean factory.
+ * 
+ * Subclasses can implement logic specific to {@link BeanDefinition} type, such as {@link AnnotatedBeanDefinition} or
+ * {@link GenericBeanDefinition}. Also subclasses can implement logic specific to JSR 318 interceptor types, such as method 
+ * interceptors or time out interceptors.
+ * 
+ * @author Niklas Schlimm
+ * 
+ */
 public abstract class InterceptorInfo {
 
-	protected static Class<? extends Annotation> interceptorAnnotationType = Interceptor.class;
+	public static Class<? extends Annotation> interceptorAnnotationType = Interceptor.class;
 
-	protected static Class<? extends Annotation> interceptorBindingAnnotationType = InterceptorBinding.class;
+	public static Class<? extends Annotation> interceptorBindingAnnotationType = InterceptorBinding.class;
 
+	/**
+	 * Bean definition of this interceptor
+	 */
 	protected BeanDefinitionHolder beanDefinitionHolder;
 
+	/**
+	 * Annotation meta data for this interceptor
+	 */
 	protected AnnotationMetadata annotationMetadata;
 
+	/**
+	 * All interceptor methods of this interceptor class
+	 */
 	private Set<Method> interceptorMethods = new HashSet<Method>();
 
+	/**
+	 * Names of the beans that this interceptor applies to
+	 */
 	private Set<String> interceptedBeans = new HashSet<String>();
 
+	/**
+	 * Bindings declared on this interceptor
+	 */
 	private List<String> interceptorBindings = new ArrayList<String>();
 
 	/**
@@ -42,7 +69,14 @@ public abstract class InterceptorInfo {
 	 */
 	protected List<Method> interceptedMethods = new ArrayList<Method>();
 
-	private void resolveInterceptorBindings() {
+	public static boolean isInterceptor(AnnotatedBeanDefinition abd) {
+		Map<String, Object> attributes = abd.getMetadata().getAnnotationAttributes(interceptorAnnotationType.getName());
+		if (attributes != null)
+			return true;
+		return false;
+	}
+
+	protected void resolveInterceptorBindings() {
 		Set<String> annotationTypes = annotationMetadata.getAnnotationTypes();
 		for (String annotationType : annotationTypes) {
 			Set<String> metaAnnotations = annotationMetadata.getMetaAnnotationTypes(annotationType);
@@ -54,15 +88,50 @@ public abstract class InterceptorInfo {
 		}
 	}
 
-	protected abstract void resolveInterceptorMethods();
-
-	public InterceptorInfo(BeanDefinitionHolder beanDefinitionHolder) {
-		Assert.isInstanceOf(AnnotatedBeanDefinition.class, beanDefinitionHolder.getBeanDefinition());
-		this.beanDefinitionHolder = beanDefinitionHolder;
-		this.annotationMetadata = ((AnnotatedBeanDefinition) beanDefinitionHolder.getBeanDefinition()).getMetadata();
-		resolveInterceptorMethods();
-		resolveInterceptorBindings();
+	/**
+	 * Check if the given bean is intercepted by this interceptor
+	 * 
+	 * @param beanName
+	 *            name of the bean in the factory
+	 * @return true, if this interceptor intercepts the bean
+	 */
+	public boolean isInterceptingBean(String beanName) {
+		Assert.notNull(beanName);
+		for (String interceptedBeanName : interceptedBeans) {
+			if (beanName.equals(interceptedBeanName))
+				return true;
+		}
+		return false;
 	}
+
+	/**
+	 * Check is this interceptor intercepts the bean on the class level or on the method level.
+	 * 
+	 * @param beanName
+	 *            name of the bean
+	 * @param givenMethod
+	 *            method that may be intercepted
+	 * 
+	 * @return true if this interceptor intercepts the (whole) bean or the method
+	 */
+	public boolean matches(String beanName, Method givenMethod) {
+		for (Method interceptedMethod : interceptedMethods) {
+			if (givenMethod.equals(interceptedMethod)) {
+				return true;
+			}
+		}
+		for (String interceptedBeanName : classLevelInterceptions) {
+			if (interceptedBeanName.equals(beanName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Subclasses can implement custom logic to resolve interceptor methods on this interceptor
+	 */
+	protected abstract void resolveInterceptorMethods();
 
 	public BeanDefinitionHolder getBeanDefinitionHolder() {
 		return beanDefinitionHolder;
@@ -70,13 +139,6 @@ public abstract class InterceptorInfo {
 
 	public void setBeanDefinitionHolder(BeanDefinitionHolder beanDefinitionHolder) {
 		this.beanDefinitionHolder = beanDefinitionHolder;
-	}
-
-	public static boolean isInterceptor(AnnotatedBeanDefinition abd) {
-		Map<String, Object> attributes = abd.getMetadata().getAnnotationAttributes(interceptorAnnotationType.getName());
-		if (attributes != null)
-			return true;
-		return false;
 	}
 
 	public AnnotationMetadata getAnnotationMetadata() {
@@ -98,15 +160,6 @@ public abstract class InterceptorInfo {
 	public void addInterceptedBean(String beanName) {
 		if (!interceptedBeans.contains(beanName))
 			interceptedBeans.add(beanName);
-	}
-
-	public boolean isInterceptingBean(String beanName) {
-		Assert.notNull(beanName);
-		for (String interceptedBeanName : interceptedBeans) {
-			if (beanName.equals(interceptedBeanName))
-				return true;
-		}
-		return false;
 	}
 
 	public void setClassLevelInterceptions(List<String> classLevelInterceptions) {
@@ -131,20 +184,6 @@ public abstract class InterceptorInfo {
 		return interceptedMethods;
 	}
 
-	public boolean matches(String beanName, Method givenMethod) {
-		for (Method interceptedMethod : interceptedMethods) {
-			if (givenMethod.equals(interceptedMethod)) {
-				return true;
-			}
-		}
-		for (String interceptedBeanName : classLevelInterceptions) {
-			if (interceptedBeanName.equals(beanName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public void setInterceptorMethods(Set<Method> interceptorMethods) {
 		this.interceptorMethods = interceptorMethods;
 	}
@@ -156,7 +195,7 @@ public abstract class InterceptorInfo {
 	public String toString() {
 		return beanDefinitionHolder.toString();
 	}
-	
+
 	public Map<String, Object> getAnnotationAttributes(String annotationType) {
 		return annotationMetadata.getAnnotationAttributes(annotationType);
 	}

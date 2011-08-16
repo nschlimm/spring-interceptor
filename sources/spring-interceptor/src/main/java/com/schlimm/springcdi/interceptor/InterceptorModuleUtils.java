@@ -1,18 +1,26 @@
 package com.schlimm.springcdi.interceptor;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.enterprise.inject.Stereotype;
-import javax.interceptor.InterceptorBinding;
-
 import org.springframework.util.Assert;
 
+/**
+ * Re-used utility methods.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 @SuppressWarnings("rawtypes")
 public class InterceptorModuleUtils {
 
+	/**
+	 * Friendly class for name implementation.
+	 * 
+	 * @param className class to find
+	 * @return class found, null if no class was found
+	 */
 	public static Class getClass_forName_Safe(String className) {
 		try {
 			Class<?> clazz = Class.forName(className);
@@ -22,6 +30,12 @@ public class InterceptorModuleUtils {
 		}
 	}
 	
+	/**
+	 * Convenient class for name implementation.
+	 * 
+	 * @param className Class to find
+	 * @return Class found
+	 */
 	public static Class getClass_forName(String className) {
 		try {
 			Class<?> clazz = Class.forName(className);
@@ -31,6 +45,13 @@ public class InterceptorModuleUtils {
 		}
 	}
 	
+	/**
+	 * Return all methods with given name.
+	 * 
+	 * @param clazz class scanned
+	 * @param methodName method name to search
+	 * @return methods found, empty {@link HashSet} if non found
+	 */
 	public static Set<Method> getMethodsForName(Class<?> clazz, String methodName) {
 		Assert.notNull(clazz, "Class must not be null");
 		Assert.notNull(methodName, "Method name must not be null");
@@ -49,24 +70,6 @@ public class InterceptorModuleUtils {
 			methods.addAll(getMethodsForName(clazz.getSuperclass(), methodName));
 		}
 		return methods;
-	}
-
-	public static boolean isInterceptorBinding(Class<? extends Annotation> candidate) {
-		for (Annotation annotation : candidate.getAnnotations()) {
-			if (annotation.annotationType().equals(InterceptorBinding.class)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean isStereotype(Class<? extends Annotation> candidate) {
-		for (Annotation annotation : candidate.getAnnotations()) {
-			if (annotation.annotationType().equals(Stereotype.class)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 }

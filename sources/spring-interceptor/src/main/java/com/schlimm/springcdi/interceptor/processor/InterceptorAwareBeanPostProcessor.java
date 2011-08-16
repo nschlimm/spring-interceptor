@@ -45,6 +45,7 @@ public class InterceptorAwareBeanPostProcessor implements BeanPostProcessor {
 		} else {
 			return bean;
 		}
+		
 	}
 
 	@SuppressWarnings("serial")
