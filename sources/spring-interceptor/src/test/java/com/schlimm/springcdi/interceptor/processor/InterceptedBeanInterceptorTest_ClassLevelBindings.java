@@ -61,7 +61,7 @@ public class InterceptedBeanInterceptorTest_ClassLevelBindings {
 		expect(invocation.getMethod()).andReturn(sayHelloWithoutArgs).anyTimes();
 		expect(invocation.getArguments()).andReturn(new Object[]{});
 		replay(invocation);
-		Assert.assertTrue(interceptor.invoke(invocation).equals("Hello_nonsense"));
+		Assert.assertTrue(interceptor.invoke(invocation).equals("Hello_hello_world"));
 		verify(invocation);
 	}
 	
@@ -71,7 +71,7 @@ public class InterceptedBeanInterceptorTest_ClassLevelBindings {
 		expect(invocation.getMethod()).andReturn(sayHelloWithArgs).anyTimes();
 		expect(invocation.getArguments()).andReturn(new Object[]{"Geek"});
 		replay(invocation);
-		Assert.assertTrue(interceptor.invoke(invocation).equals("Geek_nonsense"));
+		Assert.assertTrue(interceptor.invoke(invocation).equals("Geek_hello_world"));
 		verify(invocation);
 	}
 	
@@ -81,7 +81,7 @@ public class InterceptedBeanInterceptorTest_ClassLevelBindings {
 		expect(invocation.getMethod()).andReturn(sayGoodBye).anyTimes();
 		expect(invocation.getArguments()).andReturn(new Object[]{});
 		replay(invocation);
-		Assert.assertTrue(interceptor.invoke(invocation).equals("Good bye_nonsense"));
+		Assert.assertTrue(interceptor.invoke(invocation).equals("Good bye_hello_world"));
 		verify(invocation);
 	}
 }

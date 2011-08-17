@@ -4,7 +4,7 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
-@Interceptor @HelloWorldExtendible
+@Interceptor @ReturnValueAdopted
 public class Simple_MyInterceptor {
 
 	@AroundInvoke
@@ -16,7 +16,7 @@ public class Simple_MyInterceptor {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return result + "_nonsense";
+		return result + "_hello_world";
 	}
 	
 }

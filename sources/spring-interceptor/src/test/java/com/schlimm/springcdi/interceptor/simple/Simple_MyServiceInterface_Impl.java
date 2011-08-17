@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Qualifier("impl1")
-@HelloWorldExtendible
+@ReturnValueAdopted
 public class Simple_MyServiceInterface_Impl implements Simple_MyServiceInterface {
 
 	@Override

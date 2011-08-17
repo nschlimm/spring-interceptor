@@ -19,7 +19,7 @@ public class SimpleInterceptorTestCase {
 	
 	@Test
 	public void testHelloWorldExtension() {
-		Assert.assertTrue(someInterceptedBean.sayHello().equals("Hello_nonsense"));
+		Assert.assertTrue(someInterceptedBean.sayHello().equals("Hello_hello_world"));
 	}
 	
 }

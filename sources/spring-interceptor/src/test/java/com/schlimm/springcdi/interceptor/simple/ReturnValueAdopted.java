@@ -13,4 +13,4 @@ import javax.interceptor.InterceptorBinding;
 @InterceptorBinding
 @Target({TYPE, METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HelloWorldExtendible { }
+public @interface ReturnValueAdopted { }

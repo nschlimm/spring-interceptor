@@ -41,9 +41,9 @@ public class InterceptorAwareBeanPostProcessorTest {
 	@Test
 	public void testWorkingInterceptor() throws Throwable {
 		Simple_MyServiceInterface_Impl simple_MyServiceInterface_Impl = (Simple_MyServiceInterface_Impl) processor.postProcessAfterInitialization(beanFactory.getBean("simple_MyServiceInterface_Impl"), "simple_MyServiceInterface_Impl");
-		Assert.assertTrue(simple_MyServiceInterface_Impl.sayGoodBye().equals("Good bye_nonsense"));
-		Assert.assertTrue(simple_MyServiceInterface_Impl.sayHello().equals("Hello_nonsense"));
-		Assert.assertTrue(simple_MyServiceInterface_Impl.sayHello("Geek").equals("Geek_nonsense"));
+		Assert.assertTrue(simple_MyServiceInterface_Impl.sayGoodBye().equals("Good bye_hello_world"));
+		Assert.assertTrue(simple_MyServiceInterface_Impl.sayHello().equals("Hello_hello_world"));
+		Assert.assertTrue(simple_MyServiceInterface_Impl.sayHello("Geek").equals("Geek_hello_world"));
 	}
 	
 }
