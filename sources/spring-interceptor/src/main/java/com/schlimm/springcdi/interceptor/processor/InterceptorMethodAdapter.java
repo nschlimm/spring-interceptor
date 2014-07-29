@@ -28,10 +28,9 @@ public class InterceptorMethodAdapter implements MethodInterceptor {
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		Object retVal = null;
-		InvocationContext context = new MethodInvocationWrapper(invocation);
-		retVal = ReflectionUtils.invokeMethod(jsr318InterceptorMethod, interceptor, context);
-		return retVal;
+        InvocationContext context = new MethodInvocationWrapper(invocation);
+        Object retVal = ReflectionUtils.invokeMethod(jsr318InterceptorMethod, interceptor, context);
+        return retVal;
 	}
 
 	public Method getJsr318InterceptorMethod() {

@@ -39,8 +39,8 @@ public class ClassLevelBindingsVisitor extends InterceptorInfoVisitor {
 			if (beanAnnotation != null) { // true=bean declares this interceptor binding
 				Map<String, Object> beanAnnotationAttributes = AnnotationUtils.getAnnotationAttributes(beanAnnotation);
 				Map<String, Object> interceptorAttributes = interceptorInfo.getAnnotationAttributes(binding);
-				if (interceptorAttributes != null && interceptorAttributes.size() > 0) {
-					if (ClassLevelBindingsVisitor.matchBindingTypeMembers(beanAnnotation, beanAnnotationAttributes, interceptorAttributes)) {
+				if (interceptorAttributes != null && !interceptorAttributes.isEmpty()) {
+					if (InterceptorInfoVisitor.matchBindingTypeMembers(beanAnnotation, beanAnnotationAttributes, interceptorAttributes)) {
 						unmatchedBindings.remove(binding);
 					}
 				} else {
@@ -49,7 +49,7 @@ public class ClassLevelBindingsVisitor extends InterceptorInfoVisitor {
 			}
 		}
 		// if all declared bindings of the interceptor matched the bean, the interceptor applies on the class level
-		if (unmatchedBindings.size() == 0) {
+		if (unmatchedBindings.isEmpty()) {
 			interceptorInfo.addInterceptedBean(bdName);
 			interceptorInfo.addClassLevelInterception(bdName);
 		}

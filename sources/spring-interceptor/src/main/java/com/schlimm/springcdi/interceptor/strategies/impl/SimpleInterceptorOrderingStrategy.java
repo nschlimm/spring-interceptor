@@ -20,7 +20,7 @@ public class SimpleInterceptorOrderingStrategy implements InterceptorOrderingStr
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<InterceptorInfo> orderInterceptors(BeanFactory beanFactory, List<InterceptorInfo> interceptors, List<Class> configuredOrder) {
-		if (configuredOrder!=null && configuredOrder.size() > 0) {
+		if (configuredOrder!=null && !configuredOrder.isEmpty()) {
 			return sortInterceptors(configuredOrder, interceptors);
 		} else {
 			return interceptors;
