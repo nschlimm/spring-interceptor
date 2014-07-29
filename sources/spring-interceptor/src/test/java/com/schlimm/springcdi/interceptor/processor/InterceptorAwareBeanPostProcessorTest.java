@@ -17,7 +17,7 @@ import com.schlimm.springcdi.interceptor.model.InterceptorMetaDataBean;
 import com.schlimm.springcdi.interceptor.simple.Simple_MyServiceInterface_Impl;
 import com.schlimm.springcdi.interceptor.strategies.impl.SimpleInterceptorResolutionStrategy;
 
-@ContextConfiguration("/test-context-interceptor-simple.xml")
+@ContextConfiguration("/test-context-interceptor-simple_methodlevel.xml")
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
 public class InterceptorAwareBeanPostProcessorTest {
