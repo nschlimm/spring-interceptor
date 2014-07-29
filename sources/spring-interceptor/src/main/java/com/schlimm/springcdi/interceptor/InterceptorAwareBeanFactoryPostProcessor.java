@@ -56,7 +56,7 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 		((DefaultListableBeanFactory) beanFactory).registerBeanDefinition("_interceptorPostProcessor", BeanDefinitionBuilder.rootBeanDefinition(InterceptorAwareBeanPostProcessor.class)
 				.getBeanDefinition());
 		if (beanFactory.getBeanNamesForType(InterceptorAwareBeanPostProcessor.class) == null) {
-			throw new InterceptorAwareBeanFactoryPostProcessorException("Spring-CDI interceptor module requires DecoratorAwareBeanPostProcessor registered!");
+			throw new InterceptorAwareBeanFactoryPostProcessorException("Spring-CDI interceptor module requires InterceptorAwareBeanPostProcessor registered!");
 		}
 		createAndRegisterMetaDataBean(beanFactory);
 	}
