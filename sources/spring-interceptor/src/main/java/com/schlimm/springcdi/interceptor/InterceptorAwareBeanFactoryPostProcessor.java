@@ -8,6 +8,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import com.schlimm.springcdi.interceptor.model.InterceptorInfo;
@@ -53,10 +54,10 @@ public class InterceptorAwareBeanFactoryPostProcessor implements BeanFactoryPost
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		((DefaultListableBeanFactory) beanFactory).registerBeanDefinition("_interceptorPostProcessor", BeanDefinitionBuilder.rootBeanDefinition(InterceptorAwareBeanPostProcessor.class)
+		((BeanDefinitionRegistry) beanFactory).registerBeanDefinition("_interceptorPostProcessor", BeanDefinitionBuilder.rootBeanDefinition(InterceptorAwareBeanPostProcessor.class)
 				.getBeanDefinition());
 		if (beanFactory.getBeanNamesForType(InterceptorAwareBeanPostProcessor.class) == null) {
-			throw new InterceptorAwareBeanFactoryPostProcessorException("Spring-CDI interceptor module requires DecoratorAwareBeanPostProcessor registered!");
+			throw new InterceptorAwareBeanFactoryPostProcessorException("Spring-CDI interceptor module requires InterceptorAwareBeanPostProcessor registered!");
 		}
 		createAndRegisterMetaDataBean(beanFactory);
 	}

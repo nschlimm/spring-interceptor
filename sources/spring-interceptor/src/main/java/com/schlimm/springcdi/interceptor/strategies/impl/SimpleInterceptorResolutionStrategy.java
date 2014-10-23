@@ -26,7 +26,7 @@ public class SimpleInterceptorResolutionStrategy implements InterceptorResolutio
 
 	private static final String SCOPED_TARGET = "scopedTarget.";
 
-	private ArrayList<InterceptorInfo> registeredInterceptorsCache;
+	private List<InterceptorInfo> registeredInterceptorsCache;
 
 	private List<InterceptorInfoVisitor> visitors = Arrays.asList(new ClassLevelBindingsVisitor(), new MethodLevelBindingsVisitor());
 

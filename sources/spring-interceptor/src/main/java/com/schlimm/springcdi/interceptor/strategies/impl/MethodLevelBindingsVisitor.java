@@ -29,7 +29,7 @@ public class MethodLevelBindingsVisitor extends InterceptorInfoVisitor {
 	public void visit(InterceptorInfo interceptorInfo, BeanDefinitionHolder definition) {
 		AnnotatedBeanDefinition abd = (AnnotatedBeanDefinition) definition.getBeanDefinition();
 		Set<Method> interceptedMethods = resolveInterceptedMethodsWithBinding(abd, interceptorInfo);
-		if (interceptedMethods.size() > 0) {
+		if (!interceptedMethods.isEmpty()) {
 			interceptorInfo.addInterceptedBean(definition.getBeanName());
 		}
 		interceptorInfo.getInterceptedMethods().addAll(interceptedMethods);
@@ -51,8 +51,8 @@ public class MethodLevelBindingsVisitor extends InterceptorInfoVisitor {
 				Map<String, Object> interceptorAttributes = interceptorInfo.getAnnotationAttributes(binding);
 				if (methodAnnotation != null) {
 					Map<String, Object> methodAnnotationAttributes = AnnotationUtils.getAnnotationAttributes(methodAnnotation);
-					if (interceptorAttributes != null && interceptorAttributes.size() > 0) {
-						if (ClassLevelBindingsVisitor.matchBindingTypeMembers(methodAnnotation, methodAnnotationAttributes, interceptorAttributes)) {
+					if (interceptorAttributes != null && !interceptorAttributes.isEmpty()) {
+						if (InterceptorInfoVisitor.matchBindingTypeMembers(methodAnnotation, methodAnnotationAttributes, interceptorAttributes)) {
 							unmatchedBindings.remove(binding);
 						}
 					} else {
@@ -60,12 +60,12 @@ public class MethodLevelBindingsVisitor extends InterceptorInfoVisitor {
 					}
 				}
 				// Class level annotations apply to all methods
-				Annotation beanAnnotation = ClassLevelBindingsVisitor.findBindingAnnotation(InterceptorModuleUtils.getClass_forName(abd.getBeanClassName()),
-						InterceptorModuleUtils.getClass_forName(binding));
+				Annotation beanAnnotation = InterceptorInfoVisitor.findBindingAnnotation(InterceptorModuleUtils.getClass_forName(abd.getBeanClassName()),
+                        InterceptorModuleUtils.getClass_forName(binding));
 				if (beanAnnotation != null) { // true=bean declares this interceptor binding
 					Map<String, Object> beanAnnotationAttributes = AnnotationUtils.getAnnotationAttributes(beanAnnotation);
-					if (interceptorAttributes != null && interceptorAttributes.size() > 0) {
-						if (ClassLevelBindingsVisitor.matchBindingTypeMembers(beanAnnotation, beanAnnotationAttributes, interceptorAttributes)) {
+					if (interceptorAttributes != null && !interceptorAttributes.isEmpty()) {
+						if (InterceptorInfoVisitor.matchBindingTypeMembers(beanAnnotation, beanAnnotationAttributes, interceptorAttributes)) {
 							unmatchedBindings.remove(binding);
 						}
 					} else {
@@ -73,7 +73,7 @@ public class MethodLevelBindingsVisitor extends InterceptorInfoVisitor {
 					}
 				}
 			}
-			if (unmatchedBindings.size() == 0) {
+			if (unmatchedBindings.isEmpty()) {
 				interceptedMethods.add(method);
 			}
 		}
